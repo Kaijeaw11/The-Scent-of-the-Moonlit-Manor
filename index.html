@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Find Your Shine - Personality Test</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                fontFamily: { sans: ['Sarabun', 'sans-serif'] },
+                colors: {
+                    primary: '#8B7355',
+                    secondary: '#D4A574',
+                    accent: '#F5E6D3',
+                    cream: '#FEFBF7',
+                    gold: '#C5A065',
+                },
+                animation: {
+                    'fade-in': 'fadeIn 0.8s ease-out forwards',
+                    'slide-up': 'slideUp 0.6s ease-out forwards',
+                    'float': 'float 3s ease-in-out infinite',
+                },
+                keyframes: {
+                    fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+                    slideUp: { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+                    float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } }
+                }
+            }
+        }
+    }
+</script>
+<style>
+    .glass-panel { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.5); }
+    .story-text { line-height: 1.8; text-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+</style>
+</head>
+<body class="bg-cream text-gray-800 h-screen overflow-hidden font-sans">
+<div class="relative w-full h-full max-w-md mx-auto bg-white shadow-2xl overflow-y-auto overflow-x-hidden" id="app">
+
+<!-- HOME SCREEN -->
+<div class="screen absolute inset-0 z-50 flex flex-col items-center justify-end pb-24 bg-cover bg-center transition-opacity duration-700" id="screen-home" style="background-image: url('homepage.jpg');">
+<!-- <div class="screen absolute inset-0 z-50 flex flex-col items-center justify-end pb-24 bg-cover bg-center transition-opacity duration-700" 
+     id="screen-home" 
+     style="background-image: url('homepage.jpg');">
+     </div> -->
+
+    <div class="absolute inset-0 bg-black/10"></div>
+    <div class="relative z-10 w-full px-8 animate-slide-up">
+        <button class="group w-full bg-white hover:bg-gray-50 text-[#8B7355] font-bold py-4 px-8 rounded-full shadow-lg transform transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2 text-lg border border-[#8B7355]/20" onclick="startJourney()">
+            <span>เริ่มต้นการเดินทาง</span>
+            <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward_ios</span>
+        </button>
+        <div class="mt-6 text-center text-white/90 text-xs font-light drop-shadow-md space-y-1">
+            <p>"Fre" คือความอิสระ ที่ทำให้คุณค้นพบตัวเอง</p>
+            <p>"Via" คือเส้นทาง ที่พาคุณไปสู่โลกในฝัน</p>
+            <p class="opacity-75 pt-2 text-[10px]">เปิดประกายข้างในตัวคุณ... ค้นหาตัวตนที่แท้จริง</p>
+        </div>
+    </div>
+</div>
+
+<!-- STORY SCREEN -->
+<div class="screen hidden absolute inset-0 z-40 bg-cream flex flex-col" id="screen-story">
+    <div class="relative h-1/2 w-full overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent to-cream z-10"></div>
+        <img alt="Story Scene" class="w-full h-full object-cover animate-fade-in" id="story-image" src=""/>
+    </div>
+    <div class="flex-1 px-8 pt-4 pb-12 flex flex-col justify-between relative z-20 -mt-20">
+        <div class="glass-panel p-6 rounded-2xl shadow-sm animate-slide-up">
+            <div class="flex items-center gap-2 mb-4 text-primary text-sm font-semibold tracking-wide uppercase opacity-70">
+                <span class="material-symbols-outlined text-lg">auto_stories</span>
+                <span id="story-chapter">Chapter 1</span>
+            </div>
+            <h2 class="text-2xl font-bold text-primary mb-4 leading-tight" id="story-title"></h2>
+            <p class="text-gray-600 story-text text-lg" id="story-content"></p>
+        </div>
+        <button class="w-full bg-primary text-white py-4 rounded-xl shadow-lg font-semibold hover:bg-[#7A6548] transition-colors flex items-center justify-center gap-2 mt-6" onclick="goToQuestion()">
+            <span>ถัดไป</span>
+            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+        </button>
+    </div>
+</div>
+
+<!-- QUESTION SCREEN -->
+<div class="screen hidden absolute inset-0 z-40 bg-cream flex flex-col px-6 py-10 overflow-y-auto" id="screen-question">
+    <div class="w-full bg-gray-200 h-1.5 rounded-full mb-8 overflow-hidden">
+        <div class="bg-gradient-to-r from-primary to-secondary h-full transition-all duration-500" id="progress-bar" style="width: 25%"></div>
+    </div>
+    <h2 class="text-xl font-bold text-gray-800 mb-8 leading-relaxed animate-fade-in" id="question-text"></h2>
+    <div class="space-y-4 flex-1" id="options-container"></div>
+</div>
+
+<!-- RESULT SCREEN -->
+<div class="screen hidden absolute inset-0 z-40 bg-cream flex flex-col overflow-y-auto" id="screen-result">
+    <div class="relative h-64 bg-gradient-to-br from-[#F5E6D3] to-[#E8DCC8] flex items-center justify-center overflow-hidden">
+        <div class="text-8xl animate-float filter drop-shadow-xl" id="result-icon-large">🌸</div>
+    </div>
+    <div class="px-8 -mt-10 relative z-10 pb-12">
+        <div class="bg-white rounded-3xl shadow-xl p-8 border border-gray-100 text-center animate-slide-up">
+            <div class="text-sm text-secondary font-semibold tracking-widest uppercase mb-2">Your Inner Shine</div>
+            <h1 class="text-2xl font-bold text-primary mb-1" id="result-name"></h1>
+            <h3 class="text-gray-400 text-sm italic mb-6" id="result-subtitle"></h3>
+            <div class="w-16 h-1 bg-secondary mx-auto mb-6 rounded-full opacity-50"></div>
+            <p class="text-gray-600 leading-relaxed mb-8 text-left text-sm" id="result-desc"></p>
+            <div class="bg-cream rounded-xl p-5 mb-8">
+                <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 text-left">Key Traits</div>
+                <div class="flex flex-wrap gap-2" id="result-traits"></div>
+            </div>
+            <button class="w-full border-2 border-primary text-primary py-3 rounded-xl font-semibold hover:bg-primary hover:text-white transition-all duration-300" onclick="location.reload()">เริ่มใหม่ (Restart)</button>
+        </div>
+    </div>
+</div>
+
+</div>
+<script>
+    const stories = [
+        {
+            chapter: "ฉากที่ 1 • The Awakening",
+            title: "รสสัมผัสแรกแห่งความทรงจำ",
+            text: "คุณลืมตาขึ้นท่ามกลางกลิ่นหอมของเนื้อไม้และกะทิอบควันเทียน เบื้องหน้าคือเรือนไทยใต้แสงจันทร์... เมื่อคุณตักพุดดิ้งกะทิคำแรกเข้าปาก ความหวานมันละมุนลิ้นนั้นปลุกความรู้สึกบางอย่างให้ตื่นขึ้น",
+            image: "https://placehold.co/800x600/F5E6D3/8B7355?text=Scene+1:+Dessert+Bowl"
+        },
+        {
+            chapter: "ฉากที่ 2 • The Sudden Wind",
+            title: "ความมืดที่มาเยือน",
+            text: "ขณะที่คุณกำลังละเลียดขนม จู่ๆ ลมพัดแรงกรรโชกเข้ามาทางหน้าต่างจนตะเกียงดับวูบไปทั้งเรือน! ความมืดมิดเข้าปกคลุมชั่วขณะ เหลือเพียงแสงจันทร์สลัวที่ลอดผ่านช่องหน้าต่าง",
+            image: "https://placehold.co/800x600/333333/FFFFFF?text=Scene+2:+Dark+Room"
+        },
+        {
+            chapter: "ฉากที่ 3 • The Secret Garden",
+            title: "สวนขวัญหลังม่านหมอก",
+            text: "เจ้าของเรือนพาคุณเดินย่อยในสวนดอกไม้ ท่ามกลางหมอกจางๆ และแสงจันทร์ คุณหยุดยืนมองดอกไม้กลุ่มหนึ่งที่ส่งกลิ่นหอมเชิญชวนให้คุณเข้าไปสัมผัส...",
+            image: "https://placehold.co/800x600/2F4F4F/FFFFFF?text=Scene+3:+Night+Garden"
+        },
+        {
+            chapter: "ฉากที่ 4 • The Final Question",
+            title: "ความปรารถนาสุดท้าย",
+            text: "ก่อนจากกัน เจ้าของเรือนหันมาสบตาคุณด้วยแววตาที่ลึกซึ้ง ราวกับจะมองทะลุเข้าไปในจิตวิญญาณ พร้อมเอ่ยคำถามสุดท้ายที่จะไขความลับตัวตนของคุณ",
+            image: "https://placehold.co/800x600/8B7355/FFFFFF?text=Scene+4:+Silhouette"
+        }
+    ];
+
+    const questions = [
+        {
+            text: "รสชาตินั้น... ทำให้คุณนึกถึงสิ่งใดมากที่สุด?",
+            options: [
+                { id: 'jasmine', text: "รสมือแม่ หรือความอบอุ่นในบ้านที่แสนคุ้นเคย" },
+                { id: 'lotus', text: "ความเรียบง่ายของชีวิต และความสุขจากสิ่งใกล้ตัว" },
+                { id: 'goldenshower', text: "งานเลี้ยงที่ครื้นเครง และความสำเร็จที่หอมหวาน" },
+                { id: 'rose', text: "ความประณีตศิลป์ และความงดงามของการใช้ชีวิต" },
+                { id: 'champaca', text: "ความสงบยามค่ำคืน และการอยู่กับตัวเอง" }
+            ]
+        },
+        {
+            text: "ในความมืดมิดนั้น ใจของคุณกังวลเรื่องอะไรเป็นอันดับแรก?",
+            options: [
+                { id: 'jasmine', text: "คนรอบข้างจะตกใจไหม รีบคว้ามือคนข้างๆ มาปลอบ" },
+                { id: 'lotus', text: "ตั้งสติ นิ่งสงบ เพราะรู้ว่าความมืดเป็นเรื่องชั่วคราว" },
+                { id: 'goldenshower', text: "รีบอาสาออกไปหาตะเกียงใหม่ เพื่อนำแสงสว่างกลับมา" },
+                { id: 'rose', text: "ห่วงว่าบรรยากาศอันสุนทรีย์จะพังทลายลง" },
+                { id: 'champaca', text: "นิ่งรออย่างใจเย็น คุ้นเคยกับความเงียบสงบดีอยู่แล้ว" }
+            ]
+        },
+        {
+            text: "ดอกไม้แบบไหนที่สะท้อนตัวตนข้างในของคุณ?",
+            options: [
+                { id: 'jasmine', text: "ดอกไม้สีขาวบริสุทธิ์ที่ให้ความรู้สึกสะอาดและจริงใจ" },
+                { id: 'lotus', text: "ดอกไม้ที่ชูช่อเหนือน้ำ ดูสูงส่งและเปี่ยมปัญญา" },
+                { id: 'goldenshower', text: "ดอกไม้สีทองร่วงหล่นพราวตา ดูสง่างามและโดดเด่น" },
+                { id: 'rose', text: "ดอกไม้กลีบซ้อนสวยงาม ส่งกลิ่นหอมหวานชวนฝัน" },
+                { id: 'champaca', text: "ดอกไม้เล็กๆ ที่ส่งกลิ่นหอมลึกลับรัญจวนใจในเงามืด" }
+            ]
+        },
+        {
+            text: "หากชีวิตคือขนมหวานถ้วยนี้ คุณอยากให้ผู้คนจดจำรสชาติของคุณแบบไหน?",
+            options: [
+                { id: 'jasmine', text: "ความอ่อนโยนและนุ่มนวลที่ทำให้ทุกคนสบายใจ" },
+                { id: 'lotus', text: "ความบริสุทธิ์และเนื้อแท้ที่ไม่มีสิ่งใดเจือปน" },
+                { id: 'goldenshower', text: "ความโดดเด่นและรสชาติที่ใครได้ชิมต้องประทับใจ" },
+                { id: 'rose', text: "ความประณีตและซับซ้อนที่ซ่อนอยู่ในความหวาน" },
+                { id: 'champaca', text: "ความหอมกรุ่นที่ติดตรึงอยู่ในใจแม้วันเวลาผ่านไป" }
+            ]
+        }
+    ];
+
+    const results = {
+        jasmine: { name: 'มะลิร้อยใจ', subtitle: "Jasmine's Affection", icon: '🌸', desc: 'คุณคือความหอมละมุนที่อบอุ่นและเป็นที่รักของทุกคน เหมือนดอกมะลิที่ไร้พิษภัย ความอ่อนโยนของคุณคือพลังวิเศษที่เยียวยาคนรอบข้าง คุณให้ความสำคัญกับความรู้สึกและความสัมพันธ์ที่จริงใจ', traits: ['อ่อนโยน', 'อบอุ่น', 'จริงใจ'] },
+        lotus: { name: 'บัวเหนือน้ำ', subtitle: "Lotus Upon Water", icon: '🪷', desc: 'คุณคือความสงบท่ามกลางความวุ่นวาย เหมือนดอกบัวที่ชูช่อพ้นน้ำอย่างสง่างาม คุณมีปัญญาภายในที่ลึกซึ้ง มองโลกตามความเป็นจริง และมีความสุขได้ง่ายๆ จากความเรียบง่าย', traits: ['สงบ', 'มีปัญญา', 'เรียบง่าย'] },
+        goldenshower: { name: 'ราชพฤกษ์รุ่งโรจน์', subtitle: "Golden Shower's Dawn", icon: '✨', desc: 'คุณคือความสดใสและพลังงานบวก เหมือนดอกราชพฤกษ์สีทองที่บานสะพรั่ง คุณมีความเป็นผู้นำโดยธรรมชาติ กล้าหาญ และมักจะเป็นศูนย์กลางความสุขของกลุ่มเพื่อนเสมอ', traits: ['โดดเด่น', 'ผู้นำ', 'ร่าเริง'] },
+        rose: { name: 'กุหลาบละเมียด', subtitle: "Burmese Rose's Grace", icon: '🌹', desc: 'คุณคือศิลปะที่มีชีวิต ประณีตและมีรสนิยม เหมือนกุหลาบมอญที่ซับซ้อนและงดงาม คุณใส่ใจในรายละเอียดเล็กๆ น้อยๆ และมักสร้างสรรค์สิ่งสวยงามให้กับโลกใบนี้เสมอ', traits: ['ประณีต', 'มีเสน่ห์', 'ศิลปิน'] },
+        champaca: { name: 'ลำดวนชวนฝัน', subtitle: "Champaca's Mystery", icon: '🌙', desc: 'คุณคือความลึกลับที่น่าค้นหา เหมือนกลิ่นลำดวนยามค่ำคืน คุณมีโลกส่วนตัวที่ลึกซึ้งและน่าหลงใหล คนที่ได้รู้จักคุณมักจะตกหลุมรักในความคิดและมุมมองที่ไม่เหมือนใครของคุณ', traits: ['ลึกลับ', 'ลึกซึ้ง', 'น่าจดจำ'] }
+    };
+
+    let currentStep = 0;
+    let userAnswers = [];
+
+    function startJourney() {
+        document.getElementById('screen-home').classList.add('opacity-0', 'pointer-events-none');
+        setTimeout(() => { document.getElementById('screen-home').classList.add('hidden'); loadStory(0); }, 700);
+    }
+
+    function loadStory(index) {
+        document.getElementById('screen-story').classList.remove('hidden');
+        document.getElementById('story-chapter').innerText = stories[index].chapter;
+        document.getElementById('story-title').innerText = stories[index].title;
+        document.getElementById('story-content').innerText = stories[index].text;
+        document.getElementById('story-image').src = stories[index].image;
+        const panel = document.querySelector('.glass-panel');
+        panel.classList.remove('animate-slide-up');
+        void panel.offsetWidth;
+        panel.classList.add('animate-slide-up');
+    }
+
+    function goToQuestion() {
+        document.getElementById('screen-story').classList.add('hidden');
+        loadQuestion(currentStep);
+    }
+
+    function loadQuestion(index) {
+        document.getElementById('screen-question').classList.remove('hidden');
+        document.getElementById('progress-bar').style.width = `${((index + 1) / 4) * 100}%`;
+        document.getElementById('question-text').innerText = questions[index].text;
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        questions[index].options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = "w-full text-left bg-white border border-gray-200 p-4 rounded-xl shadow-sm hover:shadow-md hover:border-secondary hover:bg-amber-50 transition-all duration-300 group animate-slide-up";
+            btn.onclick = () => selectOption(opt.id);
+            btn.innerHTML = `<div class="flex items-center gap-3"><div class="w-6 h-6 rounded-full border-2 border-gray-300 group-hover:border-primary flex-shrink-0 flex items-center justify-center"><div class="w-3 h-3 rounded-full bg-primary transform scale-0 group-hover:scale-100 transition-transform"></div></div><span class="text-gray-700 group-hover:text-primary-900 font-medium text-sm md:text-base">${opt.text}</span></div>`;
+            container.appendChild(btn);
+        });
+    }
+
+    function selectOption(id) {
+        userAnswers.push(id);
+        currentStep++;
+        if (currentStep < 4) {
+            document.getElementById('screen-question').classList.add('hidden');
+            loadStory(currentStep);
+        } else {
+            showResult();
+        }
+    }
+
+    function showResult() {
+        document.getElementById('screen-question').classList.add('hidden');
+        document.getElementById('screen-result').classList.remove('hidden');
+        const counts = {};
+        userAnswers.forEach(x => { counts[x] = (counts[x] || 0) + 1; });
+        const winner = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
+        const data = results[winner];
+        document.getElementById('result-name').innerText = data.name;
+        document.getElementById('result-subtitle').innerText = data.subtitle;
+        document.getElementById('result-icon-large').innerText = data.icon;
+        document.getElementById('result-desc').innerHTML = data.desc;
+        const traitsContainer = document.getElementById('result-traits');
+        traitsContainer.innerHTML = '';
+        data.traits.forEach(t => {
+            const span = document.createElement('span');
+            span.className = "px-3 py-1 bg-white border border-secondary/30 rounded-full text-xs text-primary font-medium shadow-sm";
+            span.innerText = t;
+            traitsContainer.appendChild(span);
+        });
+    }
+</script>
+</body>
+</html>
